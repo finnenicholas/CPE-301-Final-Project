@@ -58,3 +58,16 @@ void setupPins(){
   pinMode(25, OUTPUT);  //LIGHT_G as output
   pinMode(26, OUTPUT);  //LIGHT_B as output
 }
+
+
+const int revSteps = 100;
+Stepper myStepper(revSteps, 6, 7, 8, 9);
+
+void stepperOpen() {
+	myStepper.setSpeed(50);
+	myStepper.step(revSteps);
+}
+void stepperClose() {
+	myStepper.setSpeed(50);
+	myStepper.step(-revSteps);
+}
