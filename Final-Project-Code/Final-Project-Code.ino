@@ -206,8 +206,24 @@ void U0init(int U0baud) {
 void stepperOpen() {
 	myStepper.setSpeed(50);
 	myStepper.step(revSteps);
+	
 }
 void stepperClose() {
 	myStepper.setSpeed(50);
 	myStepper.step(-revSteps);
+}
+
+
+int buttonState;
+int lastButtonState;
+
+void stepperButton() {
+	lastButtonState = buttonState;
+	buttonState = digitalRead(BUTTON_PIN);
+	
+	if(lastButtonState == LOW && buttonState == HIGH) {
+		stepperOpen();
+	} elif(lastButtonState == HIGH && buttonState == LOW) {
+		stepperClose();
+	}
 }
