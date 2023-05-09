@@ -61,8 +61,9 @@ void setup() {
   adc_init();
 
   error = false; // Can't start in error
+
   //Setting up RTC
-  if (! DS1307_RTC.begin()) {
+  if(! DS1307_RTC.begin()) {
     Serial.println("Couldn't find RTC");
     Serial.flush();
     abort();
@@ -77,7 +78,29 @@ void loop() {
   printTime();
   TWM();
   digitalWrite(FAN_PIN, HIGH);
-  
+  if(digitalRead(BUTTON_PIN)==HIGH) {
+    stepperOpen();
+    if (state == 0) {
+        //errored
+        disabled();
+    } else if (state == 1) {
+        //running
+        disabled();
+    } else if (state == 2) {
+        //idling
+        //to running
+    } else if (state == 3) {
+        //disabled
+        idled();
+    }
+  }
+}
+
+void disabled(){
+
+}
+void idled(){
+
 }
 void printTime(){
   DateTime now = DS1307_RTC.now();  //Gets current time
