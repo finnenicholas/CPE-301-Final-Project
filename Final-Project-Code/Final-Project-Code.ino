@@ -76,6 +76,7 @@ void loop() {
   delay(1000);
   printTime();
   TWM();
+  digitalWrite(FAN_PIN, HIGH);
 }
 void printTime(){
   DateTime now = DS1307_RTC.now();  //Gets current time
