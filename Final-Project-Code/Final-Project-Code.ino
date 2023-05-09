@@ -77,6 +77,7 @@ void loop() {
   printTime();
   TWM();
   digitalWrite(FAN_PIN, HIGH);
+  
 }
 void printTime(){
   DateTime now = DS1307_RTC.now();  //Gets current time
@@ -126,23 +127,22 @@ void TWM(){ // Temperature and Water Monitoring Function
 }
 void setupPins() {
   // Sets all the pins to the correct mode
-  pinMode(2, INPUT); // DHTPIN as input
-  pinMode(3, OUTPUT); //FAN as output
-  pinMode(4, OUTPUT); // LCD_RS as output
-  pinMode(5, OUTPUT); // LCD_EN as output
-  pinMode(10, OUTPUT); // LCD_D4 as output
-  pinMode(11, OUTPUT); // LCD_D5 as output
-  pinMode(12, OUTPUT); // LCD_D6 as output
-  pinMode(13, OUTPUT); // LCD_D7 as output
-  pinMode(6, OUTPUT); // STEPPER_PIN1 as output
-  pinMode(7, OUTPUT); // STEPPER_PIN2 as output
-  pinMode(8, OUTPUT); // STEPPER_PIN3 as output
-  pinMode(9, OUTPUT); // STEPPER_PIN4 as output
-  pinMode(22, INPUT); // LIGHT_R as output
-  pinMode(23, INPUT); // BUTTON_PIN as input
-  pinMode(24, OUTPUT);  //LIGHT_R as output
-  pinMode(25, OUTPUT);  //LIGHT_G as output
-  pinMode(26, OUTPUT);  //LIGHT_B as output
+  DDRD &= ~(1 << DHTPIN); // DHTPIN as input
+  DDRD |= (1 << FAN_PIN); // FAN as output
+  DDRD |= (1 << LCD_RS); // LCD_RS as output
+  DDRD |= (1 << LCD_EN); // LCD_EN as output
+  DDRB |= (1 << LCD_D4); // LCD_D4 as output
+  DDRB |= (1 << LCD_D5); // LCD_D5 as output
+  DDRB |= (1 << LCD_D6); // LCD_D6 as output
+  DDRB |= (1 << LCD_D7); // LCD_D7 as output
+  DDRD |= (1 << STEPPER_PIN1); // STEPPER_PIN1 as output
+  DDRD |= (1 << STEPPER_PIN2); // STEPPER_PIN2 as output
+  DDRD |= (1 << STEPPER_PIN3); // STEPPER_PIN3 as output
+  DDRB |= (1 << STEPPER_PIN4); // STEPPER_PIN4 as output
+  DDRC &= ~(1 << BUTTON_PIN); // BUTTON_PIN as input
+  DDRB |= (1 << LIGHT_R); // LIGHT_R as output
+  DDRB |= (1 << LIGHT_G); // LIGHT_G as output
+  DDRB |= (1 << LIGHT_B); // LIGHT_B as output
 }
 void LCD() {
     lcd.begin(16, 2);
@@ -204,12 +204,12 @@ void U0init(int U0baud) {
 }
 
 void stepperOpen() {
-	myStepper.setSpeed(50);
+	myStepper.setSpeed(300);
 	myStepper.step(revSteps);
 	
 }
 void stepperClose() {
-	myStepper.setSpeed(50);
+	myStepper.setSpeed(300);
 	myStepper.step(-revSteps);
 }
 
@@ -223,7 +223,9 @@ void stepperButton() {
 	
 	if(lastButtonState == LOW && buttonState == HIGH) {
 		stepperOpen();
-	} elif(lastButtonState == HIGH && buttonState == LOW) {
+    Serial.println("Button Pressed");
+	} else if(lastButtonState == HIGH && buttonState == LOW) {
 		stepperClose();
+    Serial.println("Button Pressed");
 	}
 }
