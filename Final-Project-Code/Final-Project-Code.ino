@@ -10,7 +10,7 @@
 #include "RTClib.h"
 
 #define DHTPIN 2
-#define FAN_PIN 3
+#define BUTTON_PIN 3
 #define LCD_RS 4
 #define LCD_EN 5
 #define LCD_D4 10
@@ -21,7 +21,7 @@
 #define STEPPER_PIN2 7
 #define STEPPER_PIN3 8
 #define STEPPER_PIN4 9
-#define BUTTON_PIN 23
+#define FAN_PIN 23
 #define LIGHT_R 24
 #define LIGHT_G 25
 #define LIGHT_B 26
@@ -51,17 +51,23 @@ char Week_days[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
 int waterLevel, state;
 float tempLevel, humiLevel;
 bool error;
+volatile int buttonState = LOW;
 
+void buttonPressed() {
+  buttonState = !buttonState;  // toggle the button state
+  //Serial.println(buttonState); // print the button state
+}
 
 void setup() {
   // put your setup code here, to run once:
   setupPins();
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonPressed, FALLING);
   LCD();
   U0init(9600); //Same as Serial.begin()
   adc_init();
 
   error = false; // Can't start in error
-
+  buttonState = 0;
   //Setting up RTC
   if(! DS1307_RTC.begin()) {
     Serial.println("Couldn't find RTC");
@@ -69,7 +75,6 @@ void setup() {
     abort();
   }
   DS1307_RTC.adjust(DateTime(F(__DATE__), F(__TIME__)));
-
 }
 
 void loop() {
@@ -78,8 +83,9 @@ void loop() {
   printTime();
   TWM();
   digitalWrite(FAN_PIN, HIGH);
-  if(digitalRead(BUTTON_PIN)==HIGH) {
-    stepperOpen();
+  if(buttonState == 1) {
+    Serial.println("Button Activiated");
+    //stepperOpen();
     if (state == 0) {
         //errored
         disabled();
@@ -97,7 +103,9 @@ void loop() {
 }
 
 void disabled(){
-
+  //Yellow LED
+  //no monitoring of temperature or water
+  //Start button should be monitored using an ISR
 }
 void idled(){
 
@@ -235,11 +243,7 @@ void stepperClose() {
 	myStepper.setSpeed(300);
 	myStepper.step(-revSteps);
 }
-
-
-int buttonState;
-int lastButtonState;
-
+/*
 void stepperButton() {
 	lastButtonState = buttonState;
 	buttonState = digitalRead(BUTTON_PIN);
@@ -252,3 +256,4 @@ void stepperButton() {
     Serial.println("Button Pressed");
 	}
 }
+*/
